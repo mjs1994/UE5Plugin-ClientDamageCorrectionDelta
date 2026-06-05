@@ -4,6 +4,8 @@
 
 #include "Modules/ModuleManager.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogClientDamageCorrectionDelta, Log, All);
+
 class FClientDamageCorrectionDeltaModule : public IModuleInterface
 {
 public:
