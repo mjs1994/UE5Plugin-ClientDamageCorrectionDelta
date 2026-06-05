@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "ClientDamageCorrectionDelta",
+	"Description": "Allow the server to correctly adjust damage dealt based on client reports of what was hit. This is ideal for a PvE co-op scenario where cheating isn't as important as a competitive PvP scenario.",
+	"Category": "Other",
+	"CreatedBy": "HRZN Games",
+	"CreatedByURL": "https://hrzn.games/",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ClientDamageCorrectionDelta",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
