@@ -40,6 +40,17 @@ The subsystem pairs these two reports per actor using a FIFO queue, applies dama
 
 ---
 
+## Screenshots
+
+![Example line trace](Resources/Example_LineTrace.png)
+*An example line trace showing how the damage correction subsystem should be called.*
+
+![Server RPC](Resources/Server_RPC.png)
+*The client→server RPC.*
+
+![Get damage map](Resources/GetDamageMapInterface.png)
+*The damage map interface implementation.*
+
 ## Setup
 
 ### 1. Configure the validation mode
@@ -176,3 +187,6 @@ All settings are available in `Project Settings → Plugins → Damage Correctio
 
 - This plugin is designed for **PvE co-op** scenarios. `ClientAuthoritative` mode gives full trust to the client and should not be used in competitive PvP without additional anti-cheat measures.
 - The de-duplication guard (`DamageIgnoreDelay`) uses a flat per-actor timestamp, not per-instigator. Two different players hitting the same actor within the delay window counts as one event. If you need per-instigator de-duplication, this can be extended by keying `LastHitTime` on `(actor, instigator)` pairs.
+- If using Terminal Ballistics, you can utilise the `OnBulletInjure` event as it mainly fires on pawns (amongst other things - see ["Injury"](https://github.com/ErikHedberg/Terminal-Ballistics-Example-Project/wiki#advanced-usage-callbacks) for more details).
+![Terminal Ballistics Implementation](Resources/Example_TerminalBallistics_Injure.png)
+*Example TerminalBallistics implementation.*
