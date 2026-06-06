@@ -14,6 +14,7 @@ float UDamageBoneMapDataAsset::GetMultiplierForBone(FName BoneName) const
 			return Entry.Multiplier;
 		}
 	}
+	
 	return DefaultMultiplier;
 }
 
