@@ -35,7 +35,7 @@ The subsystem pairs these two reports per actor using a FIFO queue, applies dama
 - `UDamageBoneMapDataAsset` for configuring per-bone damage multipliers in the editor.
 - `DamageIgnoreDelay` guard suppresses double-hits from bullet entry/exit wounds.
 - Stale record cleanup via TTL timer.
-- All settings configurable in `Project Settings → Plugins → Damage Correction Delta`.
+- All settings configurable in `Project Settings → Plugins → Client Damage Correction Delta`.
 - Blueprint-callable.
 
 ---
@@ -55,7 +55,7 @@ The subsystem pairs these two reports per actor using a FIFO queue, applies dama
 
 ### 1. Configure the validation mode
 
-Open `Project Settings → Plugins → Damage Correction Delta` and choose a validation mode (see [Validation Modes](#validation-modes) below).
+Open `Project Settings → Plugins → Client Damage Correction Delta` and choose a validation mode (see [Validation Modes](#validation-modes) below).
 
 ### 2. Create a Bone Map Data Asset
 
@@ -142,7 +142,7 @@ The LoS trace targets the capsule component center rather than the exact impact 
 
 ## Settings Reference
 
-All settings are available in `Project Settings → Plugins → Damage Correction Delta` and can also be overridden at runtime on the subsystem's public properties.
+All settings are available in `Project Settings → Plugins → Client Damage Correction Delta` and can also be overridden at runtime on the subsystem's public properties.
 
 | Setting | Type | Default | Description |
 |---|---|---|---|

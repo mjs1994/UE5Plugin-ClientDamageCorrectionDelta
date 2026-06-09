@@ -83,7 +83,7 @@ void UDamageCorrectionDeltaSubsystem::ReportClientHit(AController* InstigatorCon
 	switch (ValidationMode)
 	{
 		case EDamageCorrectionValidationMode::ClientAuthoritative:
-			ApplyClientDamage(HitActor, BoneName, InstigatorController, HitResult, BaseDamage, DamageTypeClass, Now);
+			ApplyClientDamage(InstigatorController, HitResult, BaseDamage, DamageTypeClass, Now);
 			return;
 
 		case EDamageCorrectionValidationMode::ClientWithValidation:
@@ -132,7 +132,7 @@ void UDamageCorrectionDeltaSubsystem::ReportClientHit(AController* InstigatorCon
 
 			UE_LOG(LogClientDamageCorrectionDelta, Warning, TEXT("[CDD] [t=%.4f] VALIDATED: actor=%s bone=%s dist=%.0fcm"), Now, *GetNameSafe(HitActor), *BoneName.ToString(), Distance);
 
-			ApplyClientDamage(HitActor, BoneName, InstigatorController, HitResult, BaseDamage, DamageTypeClass, Now);
+			ApplyClientDamage(InstigatorController, HitResult, BaseDamage, DamageTypeClass, Now);
 			return;
 		}
 
@@ -186,7 +186,7 @@ void UDamageCorrectionDeltaSubsystem::ReportClientHit(AController* InstigatorCon
 // than per-instigator tracking, which is intentional: two clients hitting the same actor
 // within DamageIgnoreDelay is treated as one event. Key LastHitTime on (actor, instigator)
 // pairs if you need per-instigator dedup.
-void UDamageCorrectionDeltaSubsystem::ApplyHitDamage(float BaseDamage, AController* InstigatorController, const FHitResult& HitResult, TSubclassOf<UDamageType> DamageTypeClass)
+void UDamageCorrectionDeltaSubsystem::ApplyHitDamage(AController* InstigatorController, const FHitResult& HitResult, float BaseDamage, TSubclassOf<UDamageType> DamageTypeClass)
 {
 	AActor* HitActor          = HitResult.GetActor();
 	const FName ServerBoneName = HitResult.BoneName;
@@ -263,8 +263,11 @@ void UDamageCorrectionDeltaSubsystem::ApplyHitDamage(float BaseDamage, AControll
 // Shared damage application for client-authoritative modes. Now is passed in from
 // the caller so the dedup check and log timestamp are consistent with the outer
 // function rather than sampling the clock a second time mid-frame.
-void UDamageCorrectionDeltaSubsystem::ApplyClientDamage(AActor* HitActor, FName BoneName, AController* InstigatorController, const FHitResult& HitResult, float BaseDamage, TSubclassOf<UDamageType> DamageTypeClass, float Now)
+void UDamageCorrectionDeltaSubsystem::ApplyClientDamage(AController* InstigatorController, const FHitResult& HitResult, float BaseDamage, TSubclassOf<UDamageType> DamageTypeClass, float Now)
 {
+	AActor* HitActor      = HitResult.GetActor();
+	const FName BoneName  = HitResult.BoneName;
+
 	if (const float* LastTime = LastHitTime.Find(HitActor))
 	{
 		if ((Now - *LastTime) < DamageIgnoreDelay)

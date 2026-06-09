@@ -62,7 +62,7 @@ public:
 	// In ServerAuthoritative mode, applies damage and buffers the record for client delta.
 	// In all other modes, forwards directly to ReportClientHit so callers never need to branch on mode.
 	UFUNCTION(BlueprintCallable, Category = "Damage Correction")
-	void ApplyHitDamage(float BaseDamage, AController* InstigatorController, const FHitResult& HitResult, TSubclassOf<UDamageType> DamageTypeClass);
+	void ApplyHitDamage(AController* InstigatorController, const FHitResult& HitResult, float BaseDamage, TSubclassOf<UDamageType> DamageTypeClass);
 
 	// Mirrors DamageCorrectionSettings::ValidationMode at runtime.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Correction|Settings")
@@ -97,7 +97,7 @@ private:
 
 	// Shared damage application used by ClientAuthoritative and ClientWithValidation after
 	// any validation has already passed.
-	void ApplyClientDamage(AActor* HitActor, FName BoneName, AController* InstigatorController, const FHitResult& HitResult, float BaseDamage, TSubclassOf<UDamageType> DamageTypeClass, float Now);
+	void ApplyClientDamage(AController* InstigatorController, const FHitResult& HitResult, float BaseDamage, TSubclassOf<UDamageType> DamageTypeClass, float Now);
 
 	// Queries IDamageBoneMapInterface on HitActor. Returns nullptr if unimplemented (damage
 	// falls back to BaseDamage unchanged via DefaultMultiplier = 1.0 in CalculateDamage).
