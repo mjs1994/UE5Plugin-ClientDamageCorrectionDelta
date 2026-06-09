@@ -66,8 +66,11 @@ UDamageBoneMapDataAsset* UDamageCorrectionDeltaSubsystem::ResolveDamageMap(AActo
 //   ServerAuthoritative    - bone is queued or paired with a buffered server hit.
 //                            The switch falls to default+break so the existing
 //                            delta logic below runs without duplication.
-void UDamageCorrectionDeltaSubsystem::ReportClientHit(AActor* HitActor, FName BoneName, AController* InstigatorController, const FHitResult& HitResult, float BaseDamage, TSubclassOf<UDamageType> DamageTypeClass)
+void UDamageCorrectionDeltaSubsystem::ReportClientHit(AController* InstigatorController, const FHitResult& HitResult, float BaseDamage, TSubclassOf<UDamageType> DamageTypeClass)
 {
+	AActor* HitActor = HitResult.GetActor();
+	const FName BoneName = HitResult.BoneName;
+
 	if (!HitActor || BoneName.IsNone())
 	{
 		return;
@@ -178,17 +181,24 @@ void UDamageCorrectionDeltaSubsystem::ReportClientHit(AActor* HitActor, FName Bo
 	PendingClientBones.FindOrAdd(HitActor).Add(MoveTemp(Report));
 }
 
-// No-op in all non-ServerAuthoritative modes - the server projectile still fires and
-// collides, but damage authority has been handed to the client RPC path.
-//
-// In ServerAuthoritative mode, the dedup guard uses a flat timestamp rather than
-// per-instigator tracking, which is intentional: two different clients shooting
-// the same actor within DamageIgnoreDelay is treated as a single event. If you
-// need per-instigator dedup, key LastHitTime on (actor, instigator) pairs instead.
-void UDamageCorrectionDeltaSubsystem::ApplyHitDamage(AActor* HitActor, FName ServerBoneName, float BaseDamage, AController* InstigatorController, const FHitResult& HitResult, TSubclassOf<UDamageType> DamageTypeClass)
+// In non-ServerAuthoritative modes the call is forwarded to ReportClientHit so callers
+// don't need to branch on mode. The dedup guard uses a flat per-actor timestamp rather
+// than per-instigator tracking, which is intentional: two clients hitting the same actor
+// within DamageIgnoreDelay is treated as one event. Key LastHitTime on (actor, instigator)
+// pairs if you need per-instigator dedup.
+void UDamageCorrectionDeltaSubsystem::ApplyHitDamage(float BaseDamage, AController* InstigatorController, const FHitResult& HitResult, TSubclassOf<UDamageType> DamageTypeClass)
 {
-	if (!HitActor || ValidationMode != EDamageCorrectionValidationMode::ServerAuthoritative)
+	AActor* HitActor          = HitResult.GetActor();
+	const FName ServerBoneName = HitResult.BoneName;
+
+	if (!HitActor)
 	{
+		return;
+	}
+
+	if (ValidationMode != EDamageCorrectionValidationMode::ServerAuthoritative)
+	{
+		ReportClientHit(InstigatorController, HitResult, BaseDamage, DamageTypeClass);
 		return;
 	}
 

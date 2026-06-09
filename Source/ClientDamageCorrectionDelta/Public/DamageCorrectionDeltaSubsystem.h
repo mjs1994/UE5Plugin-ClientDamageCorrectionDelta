@@ -46,22 +46,23 @@ public:
 	virtual void Deinitialize() override;
 
 	// Call this on the server (via a Server RPC in your projectile Blueprint) when the
-	// client's predicted projectile hits something.
+	// client's predicted projectile hits something. HitActor and BoneName are inferred
+	// from HitResult.GetActor() and HitResult.BoneName.
 	//
 	// ServerAuthoritative: stores the bone for use by ApplyHitDamage, or applies the
 	// delta immediately if the server hit has already been processed.
-	// HitResult/BaseDamage/DamageMap/DamageTypeClass are unused in this mode.
 	//
 	// ClientAuthoritative: applies damage directly from the client data.
 	// ClientWithValidation: validates distance and optionally line-of-sight before applying.
-	// Both non-server modes require HitResult, BaseDamage, DamageMap, and DamageTypeClass.
 	UFUNCTION(BlueprintCallable, Category = "Damage Correction")
-	void ReportClientHit(AActor* HitActor, FName BoneName, AController* InstigatorController, const FHitResult& HitResult, float BaseDamage, TSubclassOf<UDamageType> DamageTypeClass);
+	void ReportClientHit(AController* InstigatorController, const FHitResult& HitResult, float BaseDamage, TSubclassOf<UDamageType> DamageTypeClass);
 
 	// Call this server-side on the authoritative projectile's OnHit instead of ApplyPointDamage.
-	// No-op when ValidationMode is not ServerAuthoritative.
+	// HitActor and BoneName are inferred from HitResult.GetActor() and HitResult.BoneName.
+	// In ServerAuthoritative mode, applies damage and buffers the record for client delta.
+	// In all other modes, forwards directly to ReportClientHit so callers never need to branch on mode.
 	UFUNCTION(BlueprintCallable, Category = "Damage Correction")
-	void ApplyHitDamage(AActor* HitActor, FName ServerBoneName, float BaseDamage, AController* InstigatorController, const FHitResult& HitResult, TSubclassOf<UDamageType> DamageTypeClass);
+	void ApplyHitDamage(float BaseDamage, AController* InstigatorController, const FHitResult& HitResult, TSubclassOf<UDamageType> DamageTypeClass);
 
 	// Mirrors DamageCorrectionSettings::ValidationMode at runtime.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Correction|Settings")
@@ -72,9 +73,8 @@ public:
 	bool bValidateDistance = true;
 
 	// Mirrors DamageCorrectionSettings::MaxValidationRange at runtime.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Correction|Settings",
-	          meta = (ClampMin = "1.0", ForceUnits = "cm"))
-	float MaxValidationRange = 150000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Correction|Settings", meta = (ClampMin = "1.0", ForceUnits = "cm"))
+	float MaxValidationRange = 150000.0f;
 
 	// Mirrors DamageCorrectionSettings::bValidateLineOfSight at runtime.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Correction|Settings")

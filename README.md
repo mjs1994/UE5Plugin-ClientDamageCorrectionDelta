@@ -89,8 +89,6 @@ Create a reliable Server RPC and call it when the predicted projectile hits an a
 ```
 Get World Subsystem (DamageCorrectionDeltaSubsystem)
 → ReportClientHit
-    HitActor:             The actor that was hit
-    BoneName:             The bone name from the client hit result
     InstigatorController: The owning player controller
     HitResult:            The client hit result
     BaseDamage:           Your base damage value
@@ -104,11 +102,9 @@ Where you deal damage, replace any existing `ApplyDamage/ApplyPointDamage` calls
 ```
 Get World Subsystem (DamageCorrectionDeltaSubsystem)
 → ApplyHitDamage
-    HitActor:             The actor that was hit
-    ServerBoneName:       The bone name from the server hit result
-    BaseDamage:           Your base damage value
     InstigatorController: The instigating player controller
     HitResult:            The server hit result
+    BaseDamage:           Your base damage value
     DamageTypeClass:      Your damage type
 ```
 
@@ -163,10 +159,10 @@ All settings are available in `Project Settings → Plugins → Damage Correctio
 
 ### UDamageCorrectionDeltaSubsystem
 
-| Function | Description |
-|---|---|
-| `ReportClientHit(HitActor, BoneName, InstigatorController, HitResult, BaseDamage, DamageTypeClass)` | Call from a reliable Server RPC in your client-predicted projectile when it hits an actor |
-| `ApplyHitDamage(HitActor, ServerBoneName, BaseDamage, InstigatorController, HitResult, DamageTypeClass)` | Call from your server-authoritative projectile's hit, in place of ApplyPointDamage |
+| Function                                                                        | Description |
+|---------------------------------------------------------------------------------|---|
+| `ReportClientHit(InstigatorController, HitResult, BaseDamage, DamageTypeClass)` | Call from a reliable Server RPC in your client-predicted projectile when it hits an actor |
+| `ApplyHitDamage(InstigatorController, HitResult, BaseDamage, DamageTypeClass)`  | Call from your server-authoritative projectile's hit, in place of ApplyPointDamage |
 
 ### IDamageBoneMapInterface
 
